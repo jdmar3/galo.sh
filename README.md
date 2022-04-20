@@ -23,6 +23,7 @@ galo.sh [options]
 ## Dependencies
 
 - curl
+- jq
 
 ## Install
 
