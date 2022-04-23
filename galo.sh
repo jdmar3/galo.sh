@@ -14,9 +14,25 @@ if [ -z "$DEPCURL" ] || [ -z "$DEPJQ" ]; then
     exit 1
 fi
 
+# Show help
+function show_help () {
+	printf "Usage: $0 [options]\n"
+	printf "\n"
+	printf "--help, -h\tPrint this help\n"
+	return 0	
+}
+
+if []; then
+
+elif [ -e /home/$USER/.galoshrc ]; then
+	. /home/$USER/.galoshrc
+else
+	
+fi
+
 # Variables
-LAT=35.92
-LONG=-79.05
+LAT=35.90949
+LONG=-79.0469
 TZ=$(cat /etc/timezone)
 
 # Get one week of rain data from open-meteo.com
@@ -36,10 +52,13 @@ DATA=$(getdata_simple)
 
 TOMORROW_PRECIP=$(jq -c '.daily.precipitation_sum[1]' <<< ${DATA})
 
-if [[ $TOMORROW_PRECIP > 0 ]]; then
+if [[ ${TOMORROW_PRECIP} > 0 ]]; then
     printf "You might need your galoshes tomorrow.\n"
 else
     printf "You probably won't need your galoshes tomorrow.\n"
 fi
 
-#echo $DATA
+# If no argument or help called, exit with help
+if [[ ${#} -eq 0 ]] || [[ ${help} -eq 1 ]]; then
+	show_help
+fi

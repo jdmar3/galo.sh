@@ -2,22 +2,20 @@
 
 A bash script that uses the open-meteo API to tell you whether or not you need to wear your galoshes tomorrow.
 
-## Use
+## Usage
 
 ```
-galo.sh [options]
+galo.sh [options] -l LATITUDE LONGITUDE -z TIME_ZONE
 
---help, -h      Show this help message and exit.
+-h  Show this help message and exit.
 
---lat           Latitude of location. Stores or updates config variable in /home/$USER/.galosh.
+-l  Latitude and longitude of location. Stores or updates config variable in /home/$USER/.galosh.
 
---long          Longitude of location. Stores of updates config variable in /home/$USER/.galosh.
+-n  Get the weather now instead of tomorrow.
 
---now, -n       Get the weather now instead of tomorrow.
+-v  Verbose output (full weather forecast for the week) 
 
---verbose, -v   Verbose output (full weather forecast).
-
---debug, -d     Echo raw JSON from open-meteo API.
+-d  Echo raw JSON from open-meteo API.
 ```
 
 ## Dependencies
