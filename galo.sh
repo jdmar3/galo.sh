@@ -54,8 +54,10 @@ OPT_S=false
 OPT_E=false
 OPT_W=false
 
+VERBOSE=false
+
 # Parse command line options
-while getopts ":hjz:n:s:e:w:d:" opt; do
+while getopts ":z:n:s:e:w:d:hjv" opt; do
   case ${opt} in
     z )
       TZ=$OPTARG
@@ -93,7 +95,7 @@ while getopts ":hjz:n:s:e:w:d:" opt; do
       fi
       ;;
     d )
-      if (( "$OPTARG" >= 0 && "$OPTARG" <= 6 )); then
+      if (( "$OPTARG" >= "0" && "$OPTARG" <= "6" )); then
         DAY=$OPTARG
       else
         dump "Day option -d must be 0-6"
@@ -104,6 +106,9 @@ while getopts ":hjz:n:s:e:w:d:" opt; do
       ;;
     j )
       show_json
+      ;;
+    v )
+      VERBOSE=true
       ;;
     \? )
       dump "Invalid option: -$OPTARG\n"
@@ -127,15 +132,26 @@ fi
 if [ ! "$TZ" ]; then 
   TZ=$(cat /etc/timezone)
 fi
-# Update resource file  
-echo "LAT=${LAT}\nLONG=${LONG}\n" >> /home/$USER/.galoshrc
+# Update resource file
+tee /home/$USER/.galoshrc << the_end >/dev/null
+LAT=${LAT}
+LONG=${LONG}
+the_end
 
 DATA=$(getdata)
 
 PRECIP=$(jq -c ".daily.precipitation_hours[${DAY}]" <<< ${DATA})
 
-if [[ ${PRECIP} > 0 ]]; then
-  printf "You might need your galoshes tomorrow.\n"
+if (( "$DAY" == "0" )); then
+  DAY_PHRASE="today"
+elif (( "$DAY" >= "2" )); then
+  DAY_PHRASE="in ${DAY} days"
 else
-  printf "You probably won't need your galoshes tomorrow.\n"
+  DAY_PHRASE="tomorrow"
+fi
+
+if (( "$PRECIP" > "0" )); then
+  printf "You might need your galoshes ${DAY_PHRASE}.\n"
+else
+  printf "You probably won't need your galoshes ${DAY_PHRASE}.\n"
 fi
