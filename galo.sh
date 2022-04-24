@@ -64,6 +64,11 @@ dump () {
 # Store JSON obeject from open-meteo
 DATA=$(getdata)
 
+OPT_N=false
+OPT_S=false
+OPT_E=false
+OPT_W=false
+
 # Parse run-then-exit options
 while getopts ":hjz:n:s:e:w:" opt; do
   case ${opt} in
@@ -71,24 +76,36 @@ while getopts ":hjz:n:s:e:w:" opt; do
       TZ_IN=$OPTARG
       ;;
     n )
-      ${OPT_S} || [ ! ${OPT_E} -o ! ${OPT_W} ] && dump "Must specify LATITUDE and LONGITUDE"
-      OPT_N=1
-      LAT_IN=$(tr -d '-' <<< $OPTARG)
+      OPT_N=true
+      if [ "$OPT_S" == true ] ; then 
+        dump "Cannot specify LATITUDE twice"
+      else
+        LAT_IN=$(tr -d '-' <<< $OPTARG)
+      fi
       ;;
     s )
-      ${OPT_N} || [ ! ${OPT_E} -o ! ${OPT_W} ] && dump "Must specify LATITUDE and LONGITUDE"
-      OPT_S=1
-      LAT_IN=-$(tr -d '-' <<< $OPTARG)
+      OPT_S=true
+      if [ "$OPT_N" == true ] ; then
+        dump "Cannot specify LATITUDE twice"
+      else
+        LAT_IN=-$(tr -d '-' <<< $OPTARG)
+      fi
       ;;
     e )
-      ${OPT_W} || [ ! ${OPT_N} -o ! ${OPT_S} ] && dump "Must specify LATITUDE and LONGITUDE"
-      OPT_E=1
-      LONG_IN=$(tr -d '-' <<< $OPTARG)
+      OPT_E=true
+      if [ "$OPT_W" == true ] ; then
+        dump "Cannot specify LONGITUDE twice"
+      else
+        LONG_IN=$(tr -d '-' <<< $OPTARG)
+      fi
       ;;
     w )
-      ${OPT_E} || [ ! ${OPT_N} -o ! ${OPT_S} ] && dump "Must specify LATITUDE and LONGITUDE"
-      OPT_W=1
-      LONG_IN=-$(tr -d '-' <<< $OPTARG)
+      OPT_W=true
+      if [ "$OPT_E" == true ] ; then
+        dump "Cannot specify LONGITUDE twice"
+      else
+        LONG_IN=-$(tr -d '-' <<< $OPTARG)
+      fi
       ;;
     h )
       show_help
@@ -105,9 +122,9 @@ while getopts ":hjz:n:s:e:w:" opt; do
   esac
 done
 
-SUM_OPT=$(((${OPT_N} + ${OPT_S} + ${OPT_E} + ${OPT_W})))
-
-[ ${SUM_OPT} -gt "2" ] && dump "Cannot specify LATITUDE or LONGITUDE more than once" 
+if [[ "$OPT_N" == false && "$OPT_S" == false ]] || [[ "$OPT_E" == false && "$OPT_W" == false ]]; then
+  dump "Must specify both LATITUDE and LONGITUDE"
+fi
 
 echo "${LAT_IN} ${LONG_IN}"
 
