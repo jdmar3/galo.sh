@@ -14,7 +14,7 @@ if [ -z "$DEPCURL" ] || [ -z "$DEPJQ" ]; then
   exit 1
 fi
 # Show help function
-function show_help () {
+show_help () {
 	printf "Usage: $0 [options] -l LATITUDE LONGITUDE -z TIME_ZONE\n"
 	printf "\n"
   printf "-h  Show this help message and exit.\n"       
@@ -23,38 +23,12 @@ function show_help () {
   printf "-n  Get the weather now instead of tomorrow\n"
   printf "-v  Verbose output (full weather forecast for the week)\n"
   printf "-d  Echo raw JSON from open-meteo API\n"
-	return 0	
+	exit 0	
 }
-# Parse help option
-while getopts ":h" opt; do
-  case ${opt} in
-    h )
-      show_help
-      exit 0
-      ;;
-    \?)
-      printf "Invalid option: -$OPTARG\n" 1>&2
-      exit 1
-      ;;
-  esac
-done    
-
-#if []; then
-#
-#elif [ -e /home/$USER/.galoshrc ]; then
-#	. /home/$USER/.galoshrc
-#else
-#	
-#fi
-
-# Variables
-LAT=35.90949
-LONG=-79.0469
-TZ=$(cat /etc/timezone)
 
 
 # Get one week of rain data from open-meteo.com
-function getdata_simple(){
+getdata () {
   curl -s -G \
     -d "latitude=${LAT}" \
     -d "longitude=${LONG}" \
@@ -65,13 +39,98 @@ function getdata_simple(){
     -d "timezone=${TZ}" \
     https://api.open-meteo.com/v1/forecast
 }
+# Output pretty JSON
+show_json () {
+  echo $(getdata) | jq
+  exit 0
+}
 
-DATA=$(getdata_simple)
+dump () {
+  echo "ERROR: $*." >&2
+  exit 1
+}
 
-TOMORROW_PRECIP=$(jq -c '.daily.precipitation_sum[1]' <<< ${DATA})
+OPT_N=false
+OPT_S=false
+OPT_E=false
+OPT_W=false
 
-if [[ ${TOMORROW_PRECIP} > 0 ]]; then
-  printf "You might need your galoshes tomorrow.\n"
-else
-  printf "You probably won't need your galoshes tomorrow.\n"
+# Parse command line options
+while getopts ":hjz:n:s:e:w:" opt; do
+  case ${opt} in
+    z )
+      TZ=$OPTARG
+      ;;
+    n )
+      OPT_N=true
+      if [ "$OPT_S" == true ] ; then 
+        dump "Cannot specify LATITUDE twice"
+      else
+        LAT=$(tr -d '-' <<< $OPTARG)
+      fi
+      ;;
+    s )
+      OPT_S=true
+      if [ "$OPT_N" == true ] ; then
+        dump "Cannot specify LATITUDE twice"
+      else
+        LAT=-$(tr -d '-' <<< $OPTARG)
+      fi
+      ;;
+    e )
+      OPT_E=true
+      if [ "$OPT_W" == true ] ; then
+        dump "Cannot specify LONGITUDE twice"
+      else
+        LONG=$(tr -d '-' <<< $OPTARG)
+      fi
+      ;;
+    w )
+      OPT_W=true
+      if [ "$OPT_E" == true ] ; then
+        dump "Cannot specify LONGITUDE twice"
+      else
+        LONG=-$(tr -d '-' <<< $OPTARG)
+      fi
+      ;;
+    h )
+      show_help
+      ;;
+    j )
+      show_json
+      ;;
+    \? )
+      dump "Invalid option: -$OPTARG\n"
+      exit 1
+      ;;
+    : )
+      echo "no options"
+      exit 0
+      ;;
+  esac
+done
+# Check for resource file and if it doesn't exist, 
+if [[ "$OPT_N" == false && "$OPT_S" == false ]] || [[ "$OPT_E" == false && "$OPT_W" == false ]]; then
+  if [ -e /home/$USER/.galoshrc ]; then
+    . /home/$USER/.galoshrc
+  else
+    dump "Must specify both LATITUDE and LONGITUDE"
+  fi
 fi
+
+# Variables
+#LAT=35.90949
+#LONG=-79.0469
+if [ ! $TZ ]; then 
+  TZ=$(cat /etc/timezone)
+fi
+# Update resource file  
+echo "LAT=${LAT}\nLONG=${LONG}\n" >> /home/$USER/.galoshrc
+
+#TOMORROW_PRECIP=$(jq -c '.daily.precipitation_sum[1]' <<< ${DATA})
+
+#if [[ ${TOMORROW_PRECIP} > 0 ]]; then
+#  printf "You might need your galoshes tomorrow.\n"
+#else
+#  printf "You probably won't need your galoshes tomorrow.\n"
+#fi
