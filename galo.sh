@@ -15,14 +15,15 @@ if [ -z "$DEPCURL" ] || [ -z "$DEPJQ" ]; then
 fi
 # Show help function
 show_help () {
-	printf "Usage: $0 [options] -l LATITUDE LONGITUDE -z TIME_ZONE\n"
-	printf "\n"
-  printf "-h  Show this help message and exit.\n"       
-  printf "-l  Latitude and longitude of location (stores or updates config variable in /home/$USER/.galosh)\n"
-  printf "-z  Time zone (uses /etc/timezone by default)\n"
-  printf "-n  Get the weather now instead of tomorrow\n"
-  printf "-v  Verbose output (full weather forecast for the week)\n"
-  printf "-d  Echo raw JSON from open-meteo API\n"
+  printf -- "Usage: $0 [options] -[n|s] LATITUDE -[e|w] LONGITUDE -z TIME_ZONE\n"
+  printf -- "\n"
+  printf -- "  -h\t\tShow this help message and exit.\n"
+  printf -- "  -n, -s\tLatitude: N positive; S negative.\n"
+  printf -- "  -e, -w\tLongitude: E positive; W negative.\n"
+  printf -- "  -z\t\tTime zone: uses /etc/timezone by default.\n"
+  printf -- "  -d 0-6\tDay to retrieve weather: 0 is today; defaults to 1.\n"
+  printf -- "  -v\t\tVerbose output: returns full weather forecast.\n"
+  printf -- "  -j\t\tEcho raw JSON from open-meteo API.\n"
 	exit 0	
 }
 
@@ -54,7 +55,7 @@ OPT_E=false
 OPT_W=false
 
 # Parse command line options
-while getopts ":hjz:n:s:e:w:" opt; do
+while getopts ":hjvz:n:s:e:w:d:" opt; do
   case ${opt} in
     z )
       TZ=$OPTARG
