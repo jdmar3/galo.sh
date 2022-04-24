@@ -32,10 +32,8 @@ getdata () {
   curl -s -G \
     -d "latitude=${LAT}" \
     -d "longitude=${LONG}" \
-    -d "daily=precipitation_sum,precipitation_hours" \
-    -d "temperature_unit=fahrenheit" \
-    -d "windspeed_unit=mph" \
-    -d "precipitation_unit=inch" \
+    -d "daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,precipitation_hours,windspeed_10m_max,windgusts_10m_max,winddirection_10m_dominant" \
+    -d "current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch" \
     -d "timezone=${TZ}" \
     https://api.open-meteo.com/v1/forecast
 }
