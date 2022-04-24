@@ -64,9 +64,6 @@ dump () {
 # Store JSON obeject from open-meteo
 DATA=$(getdata)
 
-LAT_IN_COUNT=0
-LONG_IN_COUNT=0
-
 # Parse run-then-exit options
 while getopts ":hjz:n:s:e:w:" opt; do
   case ${opt} in
@@ -74,23 +71,23 @@ while getopts ":hjz:n:s:e:w:" opt; do
       TZ_IN=$OPTARG
       ;;
     n )
-      [ "${LAT_IN_COUNT}" -ne "1" ] && dump "Must specify LATITUDE and LONGITUDE"
-      LAT_IN_COUNT=$((($LAT_IN_COUNT + 1)))
+      ${OPT_S} || [ ! ${OPT_E} -o ! ${OPT_W} ] && dump "Must specify LATITUDE and LONGITUDE"
+      OPT_N=1
       LAT_IN=$(tr -d '-' <<< $OPTARG)
       ;;
     s )
-      [ "${LAT_IN_COUNT}" -ne "1" ] && dump "Must specify LATITUDE and LONGITUDE"
-      LAT_IN_COUNT=$((($LAT_IN_COUNT + 1)))
+      ${OPT_N} || [ ! ${OPT_E} -o ! ${OPT_W} ] && dump "Must specify LATITUDE and LONGITUDE"
+      OPT_S=1
       LAT_IN=-$(tr -d '-' <<< $OPTARG)
       ;;
     e )
-      [ "${LONG_IN_COUNT}" -ne "1" ] && dump "Must specify LATITUDE and LONGITUDE"
-      LONG_IN_COUNT=$((($LAT_IN_COUNT + 1)))
+      ${OPT_W} || [ ! ${OPT_N} -o ! ${OPT_S} ] && dump "Must specify LATITUDE and LONGITUDE"
+      OPT_E=1
       LONG_IN=$(tr -d '-' <<< $OPTARG)
       ;;
     w )
-      [ "${LAT_IN_COUNT}" -ne "1" ] && dump "Must specify LATITUDE and LONGITUDE"
-      LONG_IN_COUNT=$((($LAT_IN_COUNT + 1)))
+      ${OPT_E} || [ ! ${OPT_N} -o ! ${OPT_S} ] && dump "Must specify LATITUDE and LONGITUDE"
+      OPT_W=1
       LONG_IN=-$(tr -d '-' <<< $OPTARG)
       ;;
     h )
@@ -107,6 +104,10 @@ while getopts ":hjz:n:s:e:w:" opt; do
       ;;
   esac
 done
+
+SUM_OPT=$(((${OPT_N} + ${OPT_S} + ${OPT_E} + ${OPT_W})))
+
+[ ${SUM_OPT} -gt "2" ] && dump "Cannot specify LATITUDE or LONGITUDE more than once" 
 
 echo "${LAT_IN} ${LONG_IN}"
 
