@@ -21,18 +21,11 @@ Usage: ./galo.sh [options] -[n|s] LATITUDE -[e|w] LONGITUDE -z TIME_ZONE
 - curl
 - jq
 
-## Install
+## Notes
 
-If you wish to install this script so that it is available system-wide, the `install.sh` script will place the script in your `/usr/local/bin/` directory or in another directory specified by a command line argument `--path` (default path indicated below).
+If you wish to install this script system-wide, place it in /usr/local/bin/.
 
-```
-bash ./install.sh -p /usr/local/bin/
-```
+When this script runs, it will look for a resource file in /home/$USER/.galoshrc.
 
-## Uninstall
-
-To uninstall, run the following (replacing the path below with the path where the script is installed on your system):
-
-```
-bash ./install.sh -u -p /usr/local/bin/
-```
+If it does not find this .galoshrc, it will be created and populated with the last used latitude and longitude.
+.galoshrc will be updated every time the script runs so that you do not have to repeatedly enter the same coordinates.
