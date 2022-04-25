@@ -1,6 +1,6 @@
 # galo.sh
 
-A bash script that uses the open-meteo API to tell you whether or not you need to wear your galoshes tomorrow.
+A bash script that uses the [Open-Meteo API](https://open-meteo.com/en/docs#api-documentation) to tell you whether or not you need to wear your galoshes tomorrow.
 
 ## Usage
 
