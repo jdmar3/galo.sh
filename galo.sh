@@ -23,7 +23,7 @@ show_help () {
   printf -- "  -z\t\tTime zone: uses /etc/timezone by default.\n"
   printf -- "  -d 0-6\tDay to retrieve weather: 0 is today; defaults to 1.\n"
   printf -- "  -v\t\tVerbose output: returns full weather forecast.\n"
-  printf -- "  -j\t\tEcho raw JSON from open-meteo API.\n"
+  printf -- "  -j\t\tEcho pretty JSON from open-meteo API andn exit.\n"
 	exit 0	
 }
 
@@ -55,6 +55,8 @@ OPT_E=false
 OPT_W=false
 
 VERBOSE=false
+
+RESOURCE_PATH="/home/$USER/.galoshrc"
 
 # Parse command line options
 while getopts ":z:n:s:e:w:d:hjv" opt; do
@@ -122,8 +124,8 @@ while getopts ":z:n:s:e:w:d:hjv" opt; do
 done
 # Check for resource file and if it doesn't exist, 
 if [[ "$OPT_N" == false && "$OPT_S" == false ]] || [[ "$OPT_E" == false && "$OPT_W" == false ]]; then
-  if [ -e /home/$USER/.galoshrc ]; then
-    . /home/$USER/.galoshrc
+  if [ -e $RESOURCE_PATH ]; then
+    . $RESOURCE_PATH
   else
     dump "Must specify both LATITUDE and LONGITUDE"
   fi
@@ -133,7 +135,7 @@ if [ ! "$TZ" ]; then
   TZ=$(cat /etc/timezone)
 fi
 # Update resource file
-tee /home/$USER/.galoshrc << the_end >/dev/null
+tee $RESOURCE_PATH << the_end >/dev/null
 LAT=${LAT}
 LONG=${LONG}
 the_end

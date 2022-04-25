@@ -5,17 +5,15 @@ A bash script that uses the open-meteo API to tell you whether or not you need t
 ## Usage
 
 ```
-galo.sh [options] -l LATITUDE LONGITUDE -z TIME_ZONE
+Usage: ./galo.sh [options] -[n|s] LATITUDE -[e|w] LONGITUDE -z TIME_ZONE
 
--h  Show this help message and exit.
-
--l  Latitude and longitude of location. Stores or updates config variable in /home/$USER/.galosh.
-
--n  Get the weather now instead of tomorrow.
-
--v  Verbose output (full weather forecast for the week) 
-
--d  Echo raw JSON from open-meteo API.
+  -h            Show this help message and exit.
+  -n, -s        Latitude: N positive; S negative.
+  -e, -w        Longitude: E positive; W negative.
+  -z            Time zone: uses /etc/timezone by default.
+  -d 0-6        Day to retrieve weather: 0 is today; defaults to 1.
+  -v            Verbose output: returns full weather forecast.
+  -j            Echo pretty JSON from open-meteo API andn exit.
 ```
 
 ## Dependencies
