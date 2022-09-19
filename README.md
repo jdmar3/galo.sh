@@ -18,8 +18,8 @@ Usage: ./galo.sh [options] -[n|s] LATITUDE -[e|w] LONGITUDE -z TIME_ZONE
 
 ## Dependencies
 
-- curl
-- jq
+- curl [(available here)](https://curl.se/download.html)
+- jq [(available here)](https://stedolan.github.io/jq/download/)
 
 ## Notes
 
