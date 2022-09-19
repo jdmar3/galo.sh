@@ -129,7 +129,8 @@ if [[ "$OPT_N" == false && "$OPT_S" == false ]] || [[ "$OPT_E" == false && "$OPT
 fi
 # Set default time zone from system
 if [ ! "$TZ" ]; then 
-  TZ=$(cat /etc/timezone)
+#  TZ=$(cat /etc/timezone)
+  TZ=$(/bin/ls -l /etc/localtime|/usr/bin/cut -d"/" -f7,8)
 fi
 # Set default day to tomorrow
 if [ ! "$DAY" ]; then
